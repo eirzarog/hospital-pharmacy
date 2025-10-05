@@ -10,6 +10,7 @@
 
 ## Δομή του πρότζεκτ
 
+```
 pharmacy/
 ├── docs/
 │   ├── API-Documentation.md           # Πλήρης API documentation
@@ -88,3 +89,4 @@ pharmacy/
 ├── mvnw
 ├── mvnw.cmd
 └── pom.xml
+```
