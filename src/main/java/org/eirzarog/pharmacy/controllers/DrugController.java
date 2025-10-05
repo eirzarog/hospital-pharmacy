@@ -2,16 +2,22 @@ package org.eirzarog.pharmacy.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.eirzarog.pharmacy.entities.Drug;
+import org.eirzarog.pharmacy.entities.StockMovement;
+import org.eirzarog.pharmacy.entities.criteria.StockMovementSearchCriteria;
 import org.eirzarog.pharmacy.entities.dtos.ApiResponse;
 import org.eirzarog.pharmacy.entities.dtos.CreateDrugRequest;
 import org.eirzarog.pharmacy.entities.dtos.DrugDTO;
 import org.eirzarog.pharmacy.exceptions.DuplicateResourceException;
 import org.eirzarog.pharmacy.exceptions.ResourceNotFoundException;
 import org.eirzarog.pharmacy.services.DrugService;
+import org.eirzarog.pharmacy.services.StockMovementService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @RestController
@@ -20,6 +26,7 @@ import java.util.List;
 public class DrugController {
 
     private final DrugService drugService;
+    private final StockMovementService stockMovementService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<DrugDTO>>> getAllDrugs() {
@@ -28,54 +35,41 @@ public class DrugController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<DrugDTO>> createDrug(@Valid @RequestBody CreateDrugRequest request) throws DuplicateResourceException, ResourceNotFoundException {
-        DrugDTO drug = drugService.createDrug(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("The drug was successfully created", drug));
+    public ResponseEntity<?> createDrug(@RequestBody DrugDTO drugDTO) {
+        Drug createdDrug = drugService.createDrug(drugDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdDrug);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<DrugDTO>> getDrugById(@PathVariable Long id) {
-        DrugDTO drug = drugService.getDrugById(id);
-        return ResponseEntity.ok(ApiResponse.success(drug));
+
+    // GET http://localhost:8080/api/drugs?from=2025-09-13&to=2025-09-20
+    @GetMapping(params = {"from", "to"})
+    public List<Drug> getAllDrugsByDateRange(@RequestParam String from, @RequestParam String to) {
+        return drugService.filterAllDrugsByDateRange(from, to);
     }
 
-    @GetMapping("/code/{code}")
-    public ResponseEntity<ApiResponse<DrugDTO>> getDrugByCode(@PathVariable String code) {
-        DrugDTO drug = drugService.getDrugByCode(code);
-        return ResponseEntity.ok(ApiResponse.success(drug));
-    }
 
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ApiResponse<List<DrugDTO>>> getDrugsByCategory(@PathVariable Long categoryId) {
-        List<DrugDTO> drugs = drugService.getDrugsByCategory(categoryId);
-        return ResponseEntity.ok(ApiResponse.success(drugs));
-    }
 
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<DrugDTO>>> searchDrugs(@RequestParam String keyword) {
-        List<DrugDTO> drugs = drugService.searchDrugs(keyword);
-        return ResponseEntity.ok(ApiResponse.success(drugs));
-    }
 
-    @GetMapping("/low-stock")
-    public ResponseEntity<ApiResponse<List<DrugDTO>>> getLowStockDrugs(
-            @RequestParam(defaultValue = "10") Integer threshold) {
-        List<DrugDTO> drugs = drugService.getLowStockDrugs(threshold);
-        return ResponseEntity.ok(ApiResponse.success(drugs));
-    }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<DrugDTO>> updateDrug(
-            @PathVariable Long id,
-            @Valid @RequestBody CreateDrugRequest request) {
-        DrugDTO drug = drugService.updateDrug(id, request);
-        return ResponseEntity.ok(ApiResponse.success("The drug was successfully updated", drug));
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteDrug(@PathVariable Long id) {
-        drugService.deleteDrug(id);
-        return ResponseEntity.ok(ApiResponse.success("The drug was successfully deleted", null));
-    }
+
+//
+//    @GetMapping("/search")
+//    public ResponseEntity<List<StockMovement>> search(
+//            @RequestParam(required = false) Long drugId,
+//            @RequestParam(required = false) Long categoryId,
+//            @RequestParam(required = false) String from,
+//            @RequestParam(required = false) String to
+//    ) {
+//        StockMovementSearchCriteria criteria = StockMovementSearchCriteria.builder()
+//                .drugId(drugId)
+//                .categoryId(categoryId)
+//                .from(from != null ? LocalDate.parse(from).atStartOfDay(ZoneOffset.UTC).toInstant() : null)
+//                .to(to != null ? LocalDate.parse(to).atStartOfDay(ZoneOffset.UTC).toInstant() : null)
+//                .build();
+//
+//        List<StockMovement> results = stockMovementService.searchStockMovements(criteria);
+//        return ResponseEntity.ok(results);
+//    }
+
 }

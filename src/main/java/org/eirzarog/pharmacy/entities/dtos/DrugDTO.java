@@ -12,7 +12,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DrugDTO {
-    private Long id;
     private String name;
     private String code;
     private BigDecimal price;
@@ -23,6 +22,4 @@ public class DrugDTO {
     private String manufacturer;
     private Instant createdAt;
     private Instant updatedAt;
-
-
 }

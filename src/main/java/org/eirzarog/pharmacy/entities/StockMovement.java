@@ -1,11 +1,13 @@
 package org.eirzarog.pharmacy.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
 
@@ -31,18 +33,19 @@ public class StockMovement {
     private Integer quantity;
 
     @Column(name = "movement_date", nullable = false)
-    private Instant movementDate;
+    private Instant movementDate = Instant.now();
 
     @Column(name = "notes", length = 500)
     private String notes;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "performed_by", nullable = false)
     private Staff performedBy;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Instant createdAt;
 
 }

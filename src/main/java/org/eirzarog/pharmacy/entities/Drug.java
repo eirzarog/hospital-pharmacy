@@ -6,9 +6,12 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -38,7 +41,7 @@ public class Drug {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "category_id", nullable = false)
-    private DrugCategory category;
+    private DrugCategory categoryId;
 
     @Column(name = "description", length = 1000)
     private String description;
@@ -46,12 +49,14 @@ public class Drug {
     @Column(name = "manufacturer", length = 100)
     private String manufacturer;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at")
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @CreatedDate
     private Instant createdAt;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "updated_at")
+
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @LastModifiedDate
     private Instant updatedAt;
 
     @OneToMany(mappedBy = "drug")

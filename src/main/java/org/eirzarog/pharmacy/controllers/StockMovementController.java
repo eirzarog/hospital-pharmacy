@@ -1,8 +1,8 @@
 package org.eirzarog.pharmacy.controllers;
 
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.eirzarog.pharmacy.entities.StockMovement;
 import org.eirzarog.pharmacy.entities.dtos.ApiResponse;
 import org.eirzarog.pharmacy.entities.dtos.CreateStockMovementRequest;
 import org.eirzarog.pharmacy.entities.dtos.StockMovementDTO;
@@ -16,58 +16,39 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/stock_movements")
+@RequestMapping("/api/stock-movements")
 @RequiredArgsConstructor
 public class StockMovementController {
 
     private final StockMovementService stockMovementService;
 
+
+
+
     @PostMapping
-    public ResponseEntity<ApiResponse<StockMovementDTO>> createMovement(
-            @Valid @RequestBody CreateStockMovementRequest request) {
-        StockMovementDTO stockMovement = stockMovementService.createStockMovement(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("The stock movement has registered successfully", stockMovement));
+    public ResponseEntity<?> createStockMovement(@RequestBody StockMovementDTO dto) {
+        StockMovementDTO movement = stockMovementService.createStockMovement(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(movement);
     }
+
+
+
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<StockMovementDTO>>> getAllMovements() {
-        List<StockMovementDTO> stockMovement = stockMovementService.
-                getAllStockMovements();
+    public ResponseEntity<ApiResponse<List<StockMovementDTO>>> getAllStockMovements() {
+        List<StockMovementDTO> stockMovement = stockMovementService.getAllStockMovements();
         return ResponseEntity.ok(ApiResponse.success(stockMovement));
     }
 
-    @GetMapping("/drug/{drugId}")
-    public ResponseEntity<ApiResponse<List<StockMovementDTO>>> getMovementsByDrug(
-            @PathVariable Long drugId) {
-        List<StockMovementDTO> stockMovement = stockMovementService.getStockMovementsByDrug(drugId);
-        return ResponseEntity.ok(ApiResponse.success(stockMovement));
-    }
 
-    @GetMapping("/outbound/drug/{drugId}")
-    public ResponseEntity<ApiResponse<List<StockMovementDTO>>> getOutboundStockMovementsByDrugAndDateRange(
-            @PathVariable Long drugId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
 
-        List<StockMovementDTO> stockMovement = stockMovementService
-                .getOutboundStockMovementsByDrugAndDateRange(drugId, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(stockMovement));
-    }
 
-    @GetMapping("/outbound/drugs")
-    public ResponseEntity<ApiResponse<List<StockMovementDTO>>> getOutboundMovementsByDrugsAndDateRange(
-            @RequestParam List<Long> drugIds,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
 
-        List<StockMovementDTO> stockMovement = stockMovementService
-                .getOutboundStockMovementsByDrugsAndDateRange(drugIds, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(stockMovement));
-    }
+
+
 
     @GetMapping("/date-range")
-    public ResponseEntity<ApiResponse<List<StockMovementDTO>>> getMovementsByDateRange(
+    public ResponseEntity<ApiResponse<List<StockMovementDTO>>> getStockMovementsByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
 
